@@ -53,7 +53,7 @@ async def fetch_messages(channel_id):
     g_str = str[:]
     #print(g_str)
          
-async def summarize(channel_id, prompt):
+async def summarize(channel_id, prompt, title):
     try:
         global g_str
         #print("g_str")
@@ -69,7 +69,7 @@ async def summarize(channel_id, prompt):
         #print(gt.text)
         #print(gt.candidates)
         embed = discord.Embed(
-            title="要約結果",
+            title=title,
             description=gt.text,
             color=0x00ff00
         )
@@ -84,7 +84,7 @@ async def get_messages(interaction: discord.Interaction):
         channel_id = interaction.channel_id
         await interaction.response.defer()
         await fetch_messages(channel_id)
-        await summarize(channel_id,"次の文章を6000字以内で要約してください：")
+        await summarize(channel_id,"次の文章を6000字以内で要約してください：","要約結果")
         await interaction.followup.send("処理が終了しました")
     except Exception as e:
         print(e)
@@ -95,7 +95,7 @@ async def mvp(interaction: discord.Interaction):
         channel_id = interaction.channel_id
         await interaction.response.defer()
         await fetch_messages(channel_id)
-        await summarize(channel_id,"次の文章からMVP(最も格好良い発言)を選んでください：")
+        await summarize(channel_id,"次の文章からMVP(最も格好良い発言)を選んでください：","MVP")
         await interaction.followup.send("処理が終了しました")
     except Exception as e:
         print(e)
