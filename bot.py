@@ -39,7 +39,7 @@ client = MyClient(intents=intents)
 async def on_ready():
     print(f'Logged in as {client.user}')
 
-async def fetch_messages(channel_id):
+async def fetch_messages(channel_id,num):
     channel = client.get_channel(channel_id)
     if channel is None:
         print("ch not found")
@@ -48,9 +48,15 @@ async def fetch_messages(channel_id):
     one_day_ago = datetime.utcnow() - timedelta(days=1)
 
     messages = []
-    async for message in channel.history(after=one_day_ago):
-        if not message.author.bot:
-            messages.append(message)
+    if(num==0):
+        async for message in channel.history(after=one_day_ago):
+            if not message.author.bot:
+                messages.append(message)
+    else:
+        async for message in channel.history(limit=num):
+            if not message.author.bot:
+                messages.append(message)
+        
     str = ""
     if not messages:
         print("message not found")
@@ -91,7 +97,7 @@ async def get_messages(interaction: discord.Interaction):
     try:
         channel_id = interaction.channel_id
         await interaction.response.defer()
-        str = await fetch_messages(channel_id)
+        str = await fetch_messages(channel_id,0)
         embed = await summarize(channel_id,"次の文章を6000字以内で要約してください：\n"+str,"要約結果")
         await interaction.followup.send(embed=embed)
     except Exception as e:
@@ -103,8 +109,20 @@ async def mvp(interaction: discord.Interaction):
     try:
         channel_id = interaction.channel_id
         await interaction.response.defer()
-        str = await fetch_messages(channel_id)
+        str = await fetch_messages(channel_id,0)
         embed = await summarize(channel_id,"次の文章からMVP(最も格好良い発言)を選んでください：\n"+str,"MVP")
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        print(e)
+    await interaction.followup.send("処理が終了しました")
+
+@client.tree.command(name="今北産業", description="過去の100投稿を3行にまとめる")
+async def imakita(interaction: discord.Interaction):
+    try:
+        channel_id = interaction.channel_id
+        await interaction.response.defer()
+        str = await fetch_messages(channel_id,100)
+        embed = await summarize(channel_id,"次の文章を3行にまとめてください：\n"+str,"今北産業")
         await interaction.followup.send(embed=embed)
     except Exception as e:
         print(e)
@@ -115,7 +133,7 @@ async def silent_get_messages(interaction: discord.Interaction):
     try:
         channel_id = interaction.channel_id
         await interaction.response.defer(ephemeral=True)
-        str = await fetch_messages(channel_id)
+        str = await fetch_messages(channel_id,0)
         embed = await summarize(channel_id,"次の文章を6000字以内で要約してください：\n"+str,"要約結果")
         await interaction.followup.send(embed=embed)
     except Exception as e:
@@ -126,8 +144,19 @@ async def silent_mvp(interaction: discord.Interaction):
     try:
         channel_id = interaction.channel_id
         await interaction.response.defer(ephemeral=True)
-        str = await fetch_messages(channel_id)
+        str = await fetch_messages(channel_id,0)
         embed = await summarize(channel_id,"次の文章からMVP(最も格好良い発言)を選んでください：\n"+str,"MVP")
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        print(e) 
+
+@client.tree.command(name="silent今北産業", description="過去の100投稿を3行にまとめてあなただけにお届け")
+async def silent_mvp(interaction: discord.Interaction):
+    try:
+        channel_id = interaction.channel_id
+        await interaction.response.defer(ephemeral=True)
+        str = await fetch_messages(channel_id,100)
+        embed = await summarize(channel_id,"次の文章を3行にまとめてください：\n"+str,"今北産業")
         await interaction.followup.send(embed=embed)
     except Exception as e:
         print(e) 
