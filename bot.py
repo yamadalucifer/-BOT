@@ -46,11 +46,7 @@ def remove_urls(text):
     http:// または https:// で始まる文字列を削除
     """
     return re.sub(r'http[s]?://\S+', '', text)
-    channel = client.get_channel(channel_id)
-    if channel is None:
-        print("ch not found")
-        return
-
+    
 def remove_custom_emojis(text):
     """
     Discordのカスタム絵文字を削除する関数
@@ -96,6 +92,11 @@ def clean_text(text):
     return text
 
 async def fetch_messages(channel_id,num):
+
+    channel = client.get_channel(channel_id)
+    if channel is None:
+        print("ch not found")
+        return
 
     one_day_ago = datetime.utcnow() - timedelta(days=1)
 
