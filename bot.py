@@ -7,6 +7,7 @@ from google.generativeai import *
 from gtts import gTTS
 import asyncio
 from discord.ext import commands
+import re
 
 load_dotenv()
 api_token = os.getenv('MY_API_TOKEN')
@@ -39,11 +40,62 @@ client = MyClient(intents=intents)
 async def on_ready():
     print(f'Logged in as {client.user}')
 
-async def fetch_messages(channel_id,num):
+def remove_urls(text):
+    """
+    URLを削除する関数
+    http:// または https:// で始まる文字列を削除
+    """
+    return re.sub(r'http[s]?://\S+', '', text)
     channel = client.get_channel(channel_id)
     if channel is None:
         print("ch not found")
         return
+
+def remove_custom_emojis(text):
+    """
+    Discordのカスタム絵文字を削除する関数
+    <:emoji_name:emoji_id> や <a:emoji_name:emoji_id>（アニメーション絵文字）を削除
+    """
+    return re.sub(r'<a?:\w+:\d+>', '', text)
+
+def remove_unicode_emojis(text):
+    """
+    ユニコードの絵文字を削除する関数
+    笑顔やシンボル、乗り物など、幅広い絵文字を削除
+    """
+    emoji_pattern = re.compile(
+        "["
+        "\U0001F600-\U0001F64F"  # 笑顔の絵文字
+        "\U0001F300-\U0001F5FF"  # シンボル & 絵文字
+        "\U0001F680-\U0001F6FF"  # 乗り物 & 絵文字
+        "\U0001F1E0-\U0001F1FF"  # 旗の絵文字
+        "\U00002702-\U000027B0"  # その他の記号
+        "\U000024C2-\U0001F251"  # Enclosed characters
+        "]+", flags=re.UNICODE
+    )
+    return emoji_pattern.sub(r'', text)
+
+def remove_mentions(text):
+    """
+    メンションを削除する関数
+    <@user_id> や @everyone, @here, @username を削除
+    """
+    # メンション形式 <@user_id>, <@!user_id>, <@&role_id> の削除
+    text = re.sub(r'<@!?&?\d+>', '', text)
+    # 通常のメンション @everyone, @here, @username の削除
+    return re.sub(r'@\w+', '', text)
+
+def clean_text(text):
+    """
+    URL、カスタム絵文字、ユニコード絵文字、メンションを削除する
+    """
+    text = remove_urls(text)
+    text = remove_custom_emojis(text)
+    #text = remove_unicode_emojis(text)
+    text = remove_mentions(text)
+    return text
+
+async def fetch_messages(channel_id,num):
 
     one_day_ago = datetime.utcnow() - timedelta(days=1)
 
@@ -60,7 +112,7 @@ async def fetch_messages(channel_id,num):
     str = ""
     if not messages:
         print("message not found")
-        return
+        return str
     for message in messages:
         #print(f"{message.author}: {message.content}")
         str+=f"{message.author}: {message.content}\n"
@@ -208,13 +260,16 @@ async def on_message(message):
 
         # メッセージ内容を取得
         text = message.content.strip()
+
+        text = clean_text(text)
+        text = text[:20]
         
         # Google Text-to-Speechを使って音声ファイルを生成
         tts = gTTS(text=text, lang='ja')
         tts.save("message.mp3")
         
         # ボイスチャンネルでメッセージを再生
-        vc.play(discord.FFmpegPCMAudio("message.mp3"), after=lambda e: print("done", e))
+        vc.play(discord.FFmpegPCMAudio("message.mp3",options="-filter:a atempo=2.0"), after=lambda e: print("done", e))
         
         # 再生終了を待機
         while vc.is_playing():
