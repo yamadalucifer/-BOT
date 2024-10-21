@@ -131,7 +131,8 @@ async def summarize(channel_id, prompt, title):
             return
         str = prompt
         #print(str)
-        model = GenerativeModel("gemini-pro")
+        #model = GenerativeModel("gemini-pro")
+        model = GenerativeModel("gemini-1.5-pro")
         gt = model.generate_content(str)
         #print(gt.text)
         #print(gt.candidates)
