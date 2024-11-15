@@ -37,6 +37,19 @@ class MyClient(discord.Client):
 client = MyClient(intents=intents)
 
 @client.event
+async def on_voice_state_update(member, before, after):
+    voice_channel = None
+    for vc in client.voice_clients:
+        if vc.guild == member.guild:
+            voice_channel = vc.channel
+            break
+
+    # ボットがVCに参加しているかどうか確認
+    if voice_channel and len(voice_channel.members) == 1 and voice_channel.members[0] == client.user:
+        await client.voice_clients[0].disconnect()  # ボットを退出させる
+        print("VCにボットだけが残っているため、退出しました。")
+
+@client.event
 async def on_ready():
     print(f'Logged in as {client.user}')
 
