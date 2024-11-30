@@ -103,6 +103,52 @@ def clean_text(text):
     #text = remove_unicode_emojis(text)
     text = remove_mentions(text)
     return text
+async def fetch_messages2(user_id,guild_id,num):
+    str = ""
+    #print(user_id)
+    #print(guild_id)
+    #print(num)
+    guild = client.get_guild(guild_id)
+    channels = guild.channels
+    messages = []  # 自分の投稿を保存するリスト
+    for channel in channels:
+        if isinstance(channel, discord.TextChannel):
+            print(f"通常のテキストチャンネル {channel.name} から取得を開始します。")
+            #await fetch_messages_from_text_channel(user_id,channel, messages)
+            async for message in channel.history(limit=100):
+                if message.author.id == user_id:
+                    messages.append(message)
+     
+        elif isinstance(channel, discord.ForumChannel):
+            print(f"フォーラムチャンネル {channel.name} から取得を開始します。")
+            #await fetch_messages_from_forum_channel(user_id,channel, messages)
+            threads = channel.threads
+            for thread in threads:
+                async for message in thread.history(limit=100):
+                    if message.author.id == user_id:
+                        messages.append(message)
+
+    for message in messages:
+        str+=f"{message.author}: {message.content}\n"
+        #print(f"{message.author}: {message.content}\n")
+
+    #print(str)
+    return str
+
+async def fetch_messages_from_text_channel(user_id,channel, messages):
+    """通常のテキストチャンネルからメッセージを取得"""
+    async for message in channel.history(limit=100):
+        if message.author == user_id:
+            messages.append(message)
+        
+
+async def fetch_messages_from_forum_channel(user_id,forum_channel, messages):
+    """フォーラムチャンネルの各スレッドからメッセージを取得"""
+    threads = forum_channel.threads
+    async for message in thread.history(limit=100, before=last_message_id):
+        if message.author == user_id:
+            messages.append(message)
+
 
 async def fetch_messages(channel_id,num):
 
@@ -130,7 +176,6 @@ async def fetch_messages(channel_id,num):
     for message in messages:
         #print(f"{message.author}: {message.content}")
         str+=f"{message.author}: {message.content}\n"
-
     return str
     #print(g_str)
          
@@ -218,7 +263,7 @@ async def silent_mvp(interaction: discord.Interaction):
         print(e) 
 
 @client.tree.command(name="silent今北産業", description="過去の100投稿を3行にまとめてあなただけにお届け")
-async def silent_mvp(interaction: discord.Interaction):
+async def silent_imakita(interaction: discord.Interaction):
     try:
         channel_id = interaction.channel_id
         await interaction.response.defer(ephemeral=True)
@@ -254,6 +299,40 @@ async def leave(interaction: discord.Interaction):
             await interaction.response.send_message("VCに接続していません", ephemeral=True)
     except Exception as e:
         print(e)
+
+@client.tree.command(name="性格分析mbti", description="過去の投稿から性格を分析")
+async def mbti(interaction: discord.Interaction):
+    try:
+        user_id = interaction.user.id
+        user_name = interaction.user.name
+        channel_id = interaction.channel_id
+        guild_id = interaction.guild.id
+        await interaction.response.defer()
+        str = await fetch_messages2(user_id,guild_id,1000)
+        #print(str)
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)をMBTIで分析してください：\n"+str,"MBTI")
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        print(e)
+    await interaction.followup.send("処理が終了しました")
+
+
+@client.tree.command(name="silent性格分析mbti", description="過去の投稿から性格を分析して、あなただけにお届け")
+async def silent_mbti(interaction: discord.Interaction):
+    try:
+        user_id = interaction.user.id
+        user_name = interaction.user.name
+        channel_id = interaction.channel_id
+        guild_id = interaction.guild.id
+        await interaction.response.defer(ephemeral=True)
+        str = await fetch_messages2(user_id,guild_id,1000)
+        #print(str)
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)をMBTIで分析してください：\n"+str,"MBTI")
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        print(e)
+
+
 
 # メッセージが投稿された時に呼ばれるイベント
 @client.event
