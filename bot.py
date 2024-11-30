@@ -119,14 +119,14 @@ async def fetch_messages2(user_id,guild_id,num):
                 if message.author.id == user_id:
                     messages.append(message)
      
-        elif isinstance(channel, discord.ForumChannel):
-            print(f"フォーラムチャンネル {channel.name} から取得を開始します。")
-            #await fetch_messages_from_forum_channel(user_id,channel, messages)
-            threads = channel.threads
-            for thread in threads:
-                async for message in thread.history(limit=100):
-                    if message.author.id == user_id:
-                        messages.append(message)
+        #elif isinstance(channel, discord.ForumChannel):
+        #    print(f"フォーラムチャンネル {channel.name} から取得を開始します。")
+        #    #await fetch_messages_from_forum_channel(user_id,channel, messages)
+        #    threads = channel.threads
+        #    for thread in threads:
+        #        async for message in thread.history(limit=100):
+        #            if message.author.id == user_id:
+        #                messages.append(message)
 
     for message in messages:
         str+=f"{message.author}: {message.content}\n"
