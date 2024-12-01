@@ -112,13 +112,15 @@ async def fetch_messages2(user_id,guild_id,num):
     channels = guild.channels
     messages = []  # 自分の投稿を保存するリスト
     for channel in channels:
-        if isinstance(channel, discord.TextChannel):
-            print(f"通常のテキストチャンネル {channel.name} から取得を開始します。")
-            #await fetch_messages_from_text_channel(user_id,channel, messages)
-            async for message in channel.history(limit=100):
-                if message.author.id == user_id:
-                    messages.append(message)
-     
+        try:
+            if isinstance(channel, discord.TextChannel):
+                print(f"通常のテキストチャンネル {channel.name} から取得を開始します。")
+                #await fetch_messages_from_text_channel(user_id,channel, messages)
+                async for message in channel.history(limit=100):
+                    if message.author.id == user_id:
+                        messages.append(message)
+        except Exception as e:
+            print(e)
         #elif isinstance(channel, discord.ForumChannel):
         #    print(f"フォーラムチャンネル {channel.name} から取得を開始します。")
         #    #await fetch_messages_from_forum_channel(user_id,channel, messages)
