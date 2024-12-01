@@ -357,7 +357,7 @@ async def big5(interaction: discord.Interaction):
         await interaction.response.defer()
         str = await fetch_messages2(user_id,guild_id,1000)
         #print(str)
-        embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)をbig5で分析してください：\n"+str,"MBTI")
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)をbig5で分析してください：\n"+str,"BIG5")
         await interaction.followup.send(embed=embed)
     except Exception as e:
         print(e,flush=True)
@@ -374,7 +374,7 @@ async def silent_big5(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         str = await fetch_messages2(user_id,guild_id,1000)
         #print(str)
-        embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)をbig5で分析してください：\n"+str,"MBTI")
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)をbig5で分析してください：\n"+str,"BIG5")
         await interaction.followup.send(embed=embed)
     except Exception as e:
         print(e,flush=True)
