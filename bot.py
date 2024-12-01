@@ -346,6 +346,39 @@ async def silent_mbti(interaction: discord.Interaction):
     except Exception as e:
         print(e,flush=True)
 
+@client.tree.command(name="性格分析big5", description="過去の投稿から性格を分析")
+async def big5(interaction: discord.Interaction):
+    print("big5",flush=True)
+    try:
+        user_id = interaction.user.id
+        user_name = interaction.user.name
+        channel_id = interaction.channel_id
+        guild_id = interaction.guild.id
+        await interaction.response.defer()
+        str = await fetch_messages2(user_id,guild_id,1000)
+        #print(str)
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)をbig5で分析してください：\n"+str,"MBTI")
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        print(e,flush=True)
+    await interaction.followup.send("処理が終了しました")
+
+@client.tree.command(name="silent性格分析big5", description="過去の投稿から性格を分析して、あなただけにお届け")
+async def silent_big5(interaction: discord.Interaction):
+    print("silent_big5",flush=True)
+    try:
+        user_id = interaction.user.id
+        user_name = interaction.user.name
+        channel_id = interaction.channel_id
+        guild_id = interaction.guild.id
+        await interaction.response.defer(ephemeral=True)
+        str = await fetch_messages2(user_id,guild_id,1000)
+        #print(str)
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)をbig5で分析してください：\n"+str,"MBTI")
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        print(e,flush=True)
+
 
 
 # メッセージが投稿された時に呼ばれるイベント
