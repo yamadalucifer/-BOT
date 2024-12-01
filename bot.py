@@ -376,7 +376,7 @@ async def on_message(message):
         print(e)
 
 print("client.run",flush=True)
-try
+try:
     client.run(api_token)
 except Exception as e:
     print(f"Error: {e}",flush=True)
