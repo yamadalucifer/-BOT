@@ -121,7 +121,7 @@ async def fetch_messages2(user_id,guild_id,num):
                         messages.append(message)
             
             elif isinstance(channel, discord.ForumChannel):
-                print(f"フォーラムチャンネル {channel.name} から取得を開始します。",flush=true)
+                print(f"フォーラムチャンネル {channel.name} から取得を開始します。",flush=True)
                 #await fetch_messages_from_forum_channel(user_id,channel, messages)
                 threads = channel.threads
                 for thread in threads:
