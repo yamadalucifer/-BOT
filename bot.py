@@ -302,6 +302,7 @@ async def leave(interaction: discord.Interaction):
 
 @client.tree.command(name="性格分析mbti", description="過去の投稿から性格を分析")
 async def mbti(interaction: discord.Interaction):
+    print("mbti",flush=True)
     try:
         user_id = interaction.user.id
         user_name = interaction.user.name
