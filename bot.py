@@ -314,12 +314,13 @@ async def mbti(interaction: discord.Interaction):
         embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)をMBTIで分析してください：\n"+str,"MBTI")
         await interaction.followup.send(embed=embed)
     except Exception as e:
-        print(e)
+        print(e,flush=True)
     await interaction.followup.send("処理が終了しました")
 
 
 @client.tree.command(name="silent性格分析mbti", description="過去の投稿から性格を分析して、あなただけにお届け")
 async def silent_mbti(interaction: discord.Interaction):
+    print("silent_mbti",flush=True)
     try:
         user_id = interaction.user.id
         user_name = interaction.user.name
@@ -331,7 +332,7 @@ async def silent_mbti(interaction: discord.Interaction):
         embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)をMBTIで分析してください：\n"+str,"MBTI")
         await interaction.followup.send(embed=embed)
     except Exception as e:
-        print(e)
+        print(e,flush=True)
 
 
 
