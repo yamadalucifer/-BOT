@@ -114,7 +114,7 @@ async def fetch_messages2(user_id,guild_id,num):
     for channel in channels:
         try:
             if isinstance(channel, discord.TextChannel):
-                print(f"通常のテキストチャンネル {channel.name} から取得を開始します。",flush=true)
+                print(f"通常のテキストチャンネル {channel.name} から取得を開始します。",flush=True)
                 #await fetch_messages_from_text_channel(user_id,channel, messages)
                 async for message in channel.history(limit=100):
                     if message.author.id == user_id:
