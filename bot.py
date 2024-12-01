@@ -114,21 +114,31 @@ async def fetch_messages2(user_id,guild_id,num):
     for channel in channels:
         try:
             if isinstance(channel, discord.TextChannel):
-                print(f"通常のテキストチャンネル {channel.name} から取得を開始します。")
+                print(f"通常のテキストチャンネル {channel.name} から取得を開始します。",flush=true)
                 #await fetch_messages_from_text_channel(user_id,channel, messages)
                 async for message in channel.history(limit=100):
                     if message.author.id == user_id:
                         messages.append(message)
+            
+            elif isinstance(channel, discord.ForumChannel):
+                print(f"フォーラムチャンネル {channel.name} から取得を開始します。",flush=true)
+                #await fetch_messages_from_forum_channel(user_id,channel, messages)
+                threads = channel.threads
+                for thread in threads:
+                    async for message in thread.history(limit=100):
+                        if message.author.id == user_id:
+                            messages.append(message)
+
         except Exception as e:
-            print(e)
-        #elif isinstance(channel, discord.ForumChannel):
-        #    print(f"フォーラムチャンネル {channel.name} から取得を開始します。")
-        #    #await fetch_messages_from_forum_channel(user_id,channel, messages)
-        #    threads = channel.threads
-        #    for thread in threads:
-        #        async for message in thread.history(limit=100):
-        #            if message.author.id == user_id:
-        #                messages.append(message)
+            print(e,flush=True)
+            #elif isinstance(channel, discord.ForumChannel):
+            #    print(f"フォーラムチャンネル {channel.name} から取得を開始します。")
+            #    #await fetch_messages_from_forum_channel(user_id,channel, messages)
+            #    threads = channel.threads
+            #    for thread in threads:
+            #        async for message in thread.history(limit=100):
+            #            if message.author.id == user_id:
+            #                messages.append(message)
 
     for message in messages:
         str+=f"{message.author}: {message.content}\n"
