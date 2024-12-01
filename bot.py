@@ -8,7 +8,7 @@ from gtts import gTTS
 import asyncio
 from discord.ext import commands
 import re
-
+print("Hello, Railway!",flush=True)
 load_dotenv()
 api_token = os.getenv('MY_API_TOKEN')
 if api_token is None:
