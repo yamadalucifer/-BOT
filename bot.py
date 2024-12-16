@@ -379,6 +379,39 @@ async def silent_big5(interaction: discord.Interaction):
     except Exception as e:
         print(e,flush=True)
 
+@client.tree.command(name="年齢推定", description="過去の投稿から年齢を推定")
+async def age_guess(interaction: discord.Interaction):
+    print("age_guess",flush=True)
+    try:
+        user_id = interaction.user.id
+        user_name = interaction.user.name
+        channel_id = interaction.channel_id
+        guild_id = interaction.guild.id
+        await interaction.response.defer()
+        str = await fetch_messages2(user_id,guild_id,1000)
+        #print(str)
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)から精神年齢と実年齢を推定してください：\n"+str,"年齢推定")
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        print(e,flush=True)
+    await interaction.followup.send("処理が終了しました")
+
+@client.tree.command(name="silent年齢推定", description="過去の投稿から年齢を推定して、あなただけにお届け")
+async def silent_age_guess(interaction: discord.Interaction):
+    print("silent_age_guess",flush=True)
+    try:
+        user_id = interaction.user.id
+        user_name = interaction.user.name
+        channel_id = interaction.channel_id
+        guild_id = interaction.guild.id
+        await interaction.response.defer(ephemeral=True)
+        str = await fetch_messages2(user_id,guild_id,1000)
+        #print(str)
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の発言)から精神年齢と実年齢を推定してください：\n"+str,"年齢推定")
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        print(e,flush=True)
+
 
 
 # メッセージが投稿された時に呼ばれるイベント
