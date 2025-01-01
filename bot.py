@@ -103,6 +103,53 @@ def clean_text(text):
     #text = remove_unicode_emojis(text)
     text = remove_mentions(text)
     return text
+async def fetch_messages3(user_id,guild_id,num):
+    str = ""
+    #print(user_id)
+    #print(guild_id)
+    #print(num)
+    guild = client.get_guild(guild_id)
+    channels = guild.channels
+    messages = []  # 自分の投稿を保存するリスト
+    days_ago = datetime.utcnow - timedelta(days=num)
+    for channel in channels:
+        try:
+            if isinstance(channel, discord.TextChannel):
+                print(f"通常のテキストチャンネル {channel.name} から取得を開始します。",flush=True)
+                #await fetch_messages_from_text_channel(user_id,channel, messages)
+                async for message in channel.history(after=days_ago):
+                    if message.author.id == user_id:
+                        messages.append(message)
+            
+            elif isinstance(channel, discord.ForumChannel):
+                print(f"フォーラムチャンネル {channel.name} から取得を開始します。",flush=True)
+                #await fetch_messages_from_forum_channel(user_id,channel, messages)
+                threads = channel.threads
+                for thread in threads:
+                    async for message in thread.history(after=days_ago):
+                        if message.author.id == user_id:
+                            messages.append(message)
+
+        except Exception as e:
+            print(e,flush=True)
+            #elif isinstance(channel, discord.ForumChannel):
+            #    print(f"フォーラムチャンネル {channel.name} から取得を開始します。")
+            #    #await fetch_messages_from_forum_channel(user_id,channel, messages)
+            #    threads = channel.threads
+            #    for thread in threads:
+            #        async for message in thread.history(limit=100):
+            #            if message.author.id == user_id:
+            #                messages.append(message)
+
+    for message in messages:
+        str+=f"{message.author}: {message.content}\n"
+        #print(f"{message.author}: {message.content}\n")
+
+    #print(str)
+    return str
+
+
+
 async def fetch_messages2(user_id,guild_id,num):
     str = ""
     #print(user_id)
@@ -411,6 +458,50 @@ async def silent_age_guess(interaction: discord.Interaction):
         await interaction.followup.send(embed=embed)
     except Exception as e:
         print(e,flush=True)
+
+@client.tree.command(name="今日のdee", description="今日のdeeの投稿")
+async def todays_dee(interaction: discord.Interaction):
+    print("todays_dee",flush=True)
+    try:
+        user_name = "dee909.includeore"
+        guild = ctx.guild  # コマンドが実行されたサーバー
+        member = discord.utils.find(lambda m: str(m) == user_name, guild.members)
+        if member:
+            await ctx.send(f"User ID of {user_name}: {member.id}")
+            user_id = member.id
+        else:
+            await ctx.send(f"User {user_name} not found.")
+        guild_id = interaction.guild.id
+        await interaction.response.defer()
+        str = await fetch_messages2(user_id,guild_id,1)
+        #print(str)
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の１日の発言)を要約してください：\n"+str,"今日のdee")
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        print(e,flush=True)
+    await interaction.followup.send("処理が終了しました")
+
+@client.tree.command(name="silent今日のdee", description="今日のdeeの投稿を要約して、あなただけにお届け")
+async def silent_todays_dee(interaction: discord.Interaction):
+    print("silent_todays_dee",flush=True)
+    try:
+        user_name = "dee909.includeore"
+        guild = ctx.guild  # コマンドが実行されたサーバー
+        member = discord.utils.find(lambda m: str(m) == user_name, guild.members)
+        if member:
+            await ctx.send(f"User ID of {user_name}: {member.id}")
+            user_id = member.id
+        else:
+            await ctx.send(f"User {user_name} not found.")
+        guild_id = interaction.guild.id
+        await interaction.response.defer(ephemeral=True)
+        str = await fetch_messages2(user_id,guild_id,1)
+        #print(str)
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の１日の発言)を要約してください：\n"+str,"今日のdee")
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        print(e,flush=True)
+
 
 
 
