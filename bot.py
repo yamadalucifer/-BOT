@@ -471,9 +471,9 @@ async def todays_dee(interaction: discord.Interaction):
         guild_id = interaction.guild.id
         channel_id = interaction.channel_id
         await interaction.response.defer()
-        str = await fetch_messages3(user_id,guild_id,1)
+        mystr = await fetch_messages3(user_id,guild_id,1)
         #print(str)
-        embed = await summarize(channel_id,"次の文章("+ user_name + "の１日の発言)を要約してください：\n"+str,"今日のdee")
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の１日の発言)を要約してください：\n"+mystr,"今日のdee")
         await interaction.followup.send(embed=embed)
     except Exception as e:
         print(e,flush=True)
@@ -491,9 +491,9 @@ async def silent_todays_dee(interaction: discord.Interaction):
         guild_id = interaction.guild.id
         channel_id = interaction.channel_id
         await interaction.response.defer(ephemeral=True)
-        str = await fetch_messages3(user_id,guild_id,1)
+        mystr = await fetch_messages3(user_id,guild_id,1)
         #print(str)
-        embed = await summarize(channel_id,"次の文章("+ user_name + "の１日の発言)を要約してください：\n"+str,"今日のdee")
+        embed = await summarize(channel_id,"次の文章("+ user_name + "の１日の発言)を要約してください：\n"+mystr,"今日のdee")
         await interaction.followup.send(embed=embed)
     except Exception as e:
         print(e,flush=True)
