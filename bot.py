@@ -110,13 +110,14 @@ def clean_text(text):
     return text
 async def fetch_messages3(user_id,guild_id,num):
     str = ""
+    print("fetch_messages3",flush=True)
     #print(user_id)
     #print(guild_id)
     #print(num)
     guild = client.get_guild(guild_id)
     channels = guild.channels
     messages = []  # 自分の投稿を保存するリスト
-    days_ago = datetime.utcnow - timedelta(days=num)
+    days_ago = datetime.utcnow() - timedelta(days=num)
     for channel in channels:
         try:
             if isinstance(channel, discord.TextChannel):
