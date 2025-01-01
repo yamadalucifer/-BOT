@@ -517,7 +517,7 @@ async def silent_todays_dee(interaction: discord.Interaction):
             return
 
         for member in guild.members:
-            if member.name == username:
+            if member.name == user_name:
                 print(f"Name: {member.name}, Display Name: {member.display_name}, ID: {member.id}",flush=True)
         
         # メンバーを検索
