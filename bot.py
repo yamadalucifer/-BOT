@@ -489,6 +489,10 @@ async def silent_todays_dee(interaction: discord.Interaction):
         
         if member:
             user_id = member.id
+        if not member
+            await interaction.followup.send(user_name+"が見当たりません")
+            return
+
         guild_id = interaction.guild.id
         channel_id = interaction.channel_id
         await interaction.response.defer(ephemeral=True)
