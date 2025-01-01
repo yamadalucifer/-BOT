@@ -481,27 +481,45 @@ async def todays_dee(interaction: discord.Interaction):
 
 @client.tree.command(name="silent今日のdee", description="今日のdeeの投稿を要約して、あなただけにお届け")
 async def silent_todays_dee(interaction: discord.Interaction):
-    print("silent_todays_dee",flush=True)
+    print("silent_todays_dee", flush=True)
     try:
         user_name = "dee909.includeore"
         guild = interaction.guild  # コマンドが実行されたサーバー
-        member = discord.utils.find(lambda m: m.name == user_name or m.display_name == user_name, guild.members)
         
-        if member:
-            user_id = member.id
-        if not member:
-            await interaction.followup.send(user_name+"が見当たりません")
+        if not guild:
+            await interaction.response.send_message("このコマンドはサーバー内でのみ使用可能です。", ephemeral=True)
             return
 
-        guild_id = interaction.guild.id
-        channel_id = interaction.channel_id
+        # メンバーを検索
+        member = discord.utils.find(lambda m: m.name == user_name or m.display_name == user_name, guild.members)
+        
+        if not member:  # メンバーが見つからない場合
+            await interaction.response.send_message(f"{user_name} が見当たりません", ephemeral=True)
+            return
+
+        user_id = member.id
+        guild_id = guild.id
+        channel_id = interaction.channel.id
+
+        # 処理を保留
         await interaction.response.defer(ephemeral=True)
-        mystr = await fetch_messages3(user_id,guild_id,1)
-        #print(str)
-        embed = await summarize(channel_id,"次の文章("+ user_name + "の１日の発言)を要約してください：\n"+mystr,"今日のdee")
+
+        # メッセージ取得関数を呼び出す
+        mystr = await fetch_messages3(user_id, guild_id, 1)
+
+        # 要約を作成
+        embed = await summarize(
+            channel_id,
+            f"次の文章({user_name}の１日の発言)を要約してください：\n{mystr}",
+            "今日のdee"
+        )
+
+        # 結果を送信
         await interaction.followup.send(embed=embed)
+
     except Exception as e:
-        print(e,flush=True)
+        print(e, flush=True)
+        await interaction.followup.send("エラーが発生しました。", ephemeral=True)
 
 
 
