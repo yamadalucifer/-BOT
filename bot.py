@@ -461,23 +461,44 @@ async def silent_age_guess(interaction: discord.Interaction):
 
 @client.tree.command(name="今日のdee", description="今日のdeeの投稿")
 async def todays_dee(interaction: discord.Interaction):
-    print("todays_dee",flush=True)
+    print("todays_dee", flush=True)
     try:
         user_name = "dee909.includeore"
         guild = interaction.guild  # コマンドが実行されたサーバー
+        
+        if not guild:
+            await interaction.response.send_message("このコマンドはサーバー内でのみ使用可能です。", ephemeral=True)
+            return
+
+        # メンバーを検索
         member = discord.utils.find(lambda m: m.name == user_name or m.display_name == user_name, guild.members)
-        if member:
-            user_id = member.id
-        guild_id = interaction.guild.id
-        channel_id = interaction.channel_id
+        if not member:
+            await interaction.response.send_message(f"ユーザー {user_name} が見つかりません。", ephemeral=True)
+            return
+
+        user_id = member.id
+        guild_id = guild.id
+        channel_id = interaction.channel.id
+
+        # 処理が長い場合の保留
         await interaction.response.defer()
-        mystr = await fetch_messages3(user_id,guild_id,1)
-        #print(str)
-        embed = await summarize(channel_id,"次の文章("+ user_name + "の１日の発言)を要約してください：\n"+mystr,"今日のdee")
+
+        # fetch_messages3関数を呼び出す
+        mystr = await fetch_messages3(user_id, guild_id, 1)
+
+        # 要約を作成
+        embed = await summarize(
+            channel_id,
+            f"次の文章({user_name}の１日の発言)を要約してください：\n{mystr}",
+            "今日のdee"
+        )
+
+        # 結果を送信
         await interaction.followup.send(embed=embed)
+
     except Exception as e:
-        print(e,flush=True)
-    await interaction.followup.send("処理が終了しました")
+        print(e, flush=True)
+        await interaction.followup.send("エラーが発生しました。", ephemeral=True)
 
 @client.tree.command(name="silent今日のdee", description="今日のdeeの投稿を要約して、あなただけにお届け")
 async def silent_todays_dee(interaction: discord.Interaction):
