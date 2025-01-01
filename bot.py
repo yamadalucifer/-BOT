@@ -489,7 +489,7 @@ async def silent_todays_dee(interaction: discord.Interaction):
         
         if member:
             user_id = member.id
-        if not member
+        if not member:
             await interaction.followup.send(user_name+"が見当たりません")
             return
 
