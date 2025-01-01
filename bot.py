@@ -465,7 +465,7 @@ async def todays_dee(interaction: discord.Interaction):
     try:
         user_name = "dee909.includeore"
         guild = interaction.guild  # コマンドが実行されたサーバー
-        member = discord.utils.find(lambda m: str(m) == user_name, guild.members)
+        member = discord.utils.find(lambda m: m.name == user_name or m.display_name == user_name, guild.members)
         if member:
             user_id = member.id
         guild_id = interaction.guild.id
@@ -485,7 +485,8 @@ async def silent_todays_dee(interaction: discord.Interaction):
     try:
         user_name = "dee909.includeore"
         guild = interaction.guild  # コマンドが実行されたサーバー
-        member = discord.utils.find(lambda m: str(m) == user_name, guild.members)
+        member = discord.utils.find(lambda m: m.name == user_name or m.display_name == user_name, guild.members)
+        
         if member:
             user_id = member.id
         guild_id = interaction.guild.id
