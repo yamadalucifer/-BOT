@@ -464,16 +464,14 @@ async def todays_dee(interaction: discord.Interaction):
     print("todays_dee",flush=True)
     try:
         user_name = "dee909.includeore"
-        guild = ctx.guild  # コマンドが実行されたサーバー
+        guild = interaction.guild  # コマンドが実行されたサーバー
         member = discord.utils.find(lambda m: str(m) == user_name, guild.members)
         if member:
-            await ctx.send(f"User ID of {user_name}: {member.id}")
             user_id = member.id
-        else:
-            await ctx.send(f"User {user_name} not found.")
         guild_id = interaction.guild.id
+        channel_id = interaction.channel_id
         await interaction.response.defer()
-        str = await fetch_messages2(user_id,guild_id,1)
+        str = await fetch_messages3(user_id,guild_id,1)
         #print(str)
         embed = await summarize(channel_id,"次の文章("+ user_name + "の１日の発言)を要約してください：\n"+str,"今日のdee")
         await interaction.followup.send(embed=embed)
@@ -486,16 +484,14 @@ async def silent_todays_dee(interaction: discord.Interaction):
     print("silent_todays_dee",flush=True)
     try:
         user_name = "dee909.includeore"
-        guild = ctx.guild  # コマンドが実行されたサーバー
+        guild = interaction.guild  # コマンドが実行されたサーバー
         member = discord.utils.find(lambda m: str(m) == user_name, guild.members)
         if member:
-            await ctx.send(f"User ID of {user_name}: {member.id}")
             user_id = member.id
-        else:
-            await ctx.send(f"User {user_name} not found.")
         guild_id = interaction.guild.id
+        channel_id = interaction.channel_id
         await interaction.response.defer(ephemeral=True)
-        str = await fetch_messages2(user_id,guild_id,1)
+        str = await fetch_messages3(user_id,guild_id,1)
         #print(str)
         embed = await summarize(channel_id,"次の文章("+ user_name + "の１日の発言)を要約してください：\n"+str,"今日のdee")
         await interaction.followup.send(embed=embed)
