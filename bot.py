@@ -16,11 +16,15 @@ if api_token is None:
 api_key = os.getenv('MY_API_KEY')
 configure(api_key=api_key)
 
+# インテントの設定
 intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
 intents.voice_states = True
 intents.message_content = True
+intents.members = True  # サーバーメンバー情報を取得
+
+client = discord.Client(intents=intents)
 
 # サーバーごとにボイスチャンネルとテキストチャンネルを記録する辞書
 selected_text_channel = {}
@@ -52,6 +56,7 @@ async def on_voice_state_update(member, before, after):
 @client.event
 async def on_ready():
     print(f'Logged in as {client.user}')
+
 
 def remove_urls(text):
     """
