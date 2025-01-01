@@ -467,13 +467,13 @@ async def todays_dee(interaction: discord.Interaction):
         guild = interaction.guild  # コマンドが実行されたサーバー
         
         if not guild:
-            await interaction.response.send_message("このコマンドはサーバー内でのみ使用可能です。", ephemeral=True)
+            await interaction.response.send_message("このコマンドはサーバー内でのみ使用可能です。")
             return
 
         # メンバーを検索
         member = discord.utils.find(lambda m: m.name == user_name or m.display_name == user_name, guild.members)
         if not member:
-            await interaction.response.send_message(f"ユーザー {user_name} が見つかりません。", ephemeral=True)
+            await interaction.response.send_message(f"ユーザー {user_name} が見つかりません。")
             return
 
         user_id = member.id
@@ -498,7 +498,7 @@ async def todays_dee(interaction: discord.Interaction):
 
     except Exception as e:
         print(e, flush=True)
-        await interaction.followup.send("エラーが発生しました。", ephemeral=True)
+        await interaction.followup.send("エラーが発生しました。")
 
 @client.tree.command(name="silent今日のdee", description="今日のdeeの投稿を要約して、あなただけにお届け")
 async def silent_todays_dee(interaction: discord.Interaction):
