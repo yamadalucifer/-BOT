@@ -108,6 +108,51 @@ def clean_text(text):
     #text = remove_unicode_emojis(text)
     text = remove_mentions(text)
     return text
+
+async def fetch_messages4(user_id,guild_id,num):
+    str = ""
+    print("fetch_messages4",flush=True)
+    #print(user_id)
+    #print(guild_id)
+    #print(num)
+    guild = client.get_guild(guild_id)
+    channels = guild.channels
+    messages = []  # 自分の投稿を保存するリスト
+    days_ago = datetime.utcnow() - timedelta(days=num)
+    for channel in channels:
+        try:
+            if isinstance(channel, discord.TextChannel):
+                print(f"通常のテキストチャンネル {channel.name} から取得を開始します。",flush=True)
+                #await fetch_messages_from_text_channel(user_id,channel, messages)
+                async for message in channel.history(after=days_ago):
+                    messages.append(message)
+            
+            elif isinstance(channel, discord.ForumChannel):
+                print(f"フォーラムチャンネル {channel.name} から取得を開始します。",flush=True)
+                #await fetch_messages_from_forum_channel(user_id,channel, messages)
+                threads = channel.threads
+                for thread in threads:
+                    async for message in thread.history(after=days_ago):
+                        messages.append(message)
+
+        except Exception as e:
+            print(e,flush=True)
+            #elif isinstance(channel, discord.ForumChannel):
+            #    print(f"フォーラムチャンネル {channel.name} から取得を開始します。")
+            #    #await fetch_messages_from_forum_channel(user_id,channel, messages)
+            #    threads = channel.threads
+            #    for thread in threads:
+            #        async for message in thread.history(limit=100):
+            #            if message.author.id == user_id:
+            #                messages.append(message)
+
+    for message in messages:
+        str+=f"{message.author}: {message.content}\n"
+        #print(f"{message.author}: {message.content}\n")
+
+    #print(str)
+    return str
+
 async def fetch_messages3(user_id,guild_id,num):
     str = ""
     print("fetch_messages3",flush=True)
@@ -552,6 +597,73 @@ async def silent_todays_dee(interaction: discord.Interaction):
         print(e, flush=True)
         await interaction.followup.send("エラーが発生しました。", ephemeral=True)
 
+@client.tree.command(name="今日のサーバー", description="今日のサーバーの投稿")
+async def todays_server(interaction: discord.Interaction):
+    print("todays_server", flush=True)
+    try:
+        guild = interaction.guild  # コマンドが実行されたサーバー
+        
+        if not guild:
+            await interaction.response.send_message("このコマンドはサーバー内でのみ使用可能です。")
+            return
+
+
+        guild_id = guild.id
+        channel_id = interaction.channel.id
+
+        # 処理が長い場合の保留
+        await interaction.response.defer()
+
+        # fetch_messages3関数を呼び出す
+        mystr = await fetch_messages4(0, guild_id, 1)
+
+        # 要約を作成
+        embed = await summarize(
+            channel_id,
+            f"次の文章(ディスコードサーバー上での１日の発言)を要約してください：\n{mystr}",
+            "今日のサーバー"
+        )
+
+        # 結果を送信
+        await interaction.followup.send(embed=embed)
+
+    except Exception as e:
+        print(e, flush=True)
+        await interaction.followup.send("エラーが発生しました。")
+
+@client.tree.command(name="silent今日のサーバー", description="今日のサーバーの投稿を要約して、あなただけにお届け")
+async def silent_todays_server(interaction: discord.Interaction):
+    print("silent_todays_server", flush=True)
+    try:
+        guild = interaction.guild  # コマンドが実行されたサーバー
+        
+        if not guild:
+            await interaction.response.send_message("このコマンドはサーバー内でのみ使用可能です。", ephemeral=True)
+            return
+        
+
+        guild_id = guild.id
+        channel_id = interaction.channel.id
+
+        # 処理を保留
+        await interaction.response.defer(ephemeral=True)
+
+        # メッセージ取得関数を呼び出す
+        mystr = await fetch_messages4(0, guild_id, 1)
+
+        # 要約を作成
+        embed = await summarize(
+            channel_id,
+            f"次の文章(ディスコードサーバーの１日の発言)を要約してください：\n{mystr}",
+            "今日のサーバー"
+        )
+
+        # 結果を送信
+        await interaction.followup.send(embed=embed)
+
+    except Exception as e:
+        print(e, flush=True)
+        await interaction.followup.send("エラーが発生しました。", ephemeral=True)
 
 
 
