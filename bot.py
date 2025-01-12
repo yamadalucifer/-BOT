@@ -615,9 +615,11 @@ async def todays_server(interaction: discord.Interaction):
         await interaction.response.defer()
 
         # fetch_messages3関数を呼び出す
+        print("before fetch messages 4",flush=True)
         mystr = await fetch_messages4(0, guild_id, 1)
 
         # 要約を作成
+        print("before summarize",flush=True)
         embed = await summarize(
             channel_id,
             f"次の文章(ディスコードサーバー上での１日の発言)を要約してください：\n{mystr}",
@@ -625,6 +627,7 @@ async def todays_server(interaction: discord.Interaction):
         )
 
         # 結果を送信
+        print("before follow up",flush=True)
         await interaction.followup.send(embed=embed)
 
     except Exception as e:
